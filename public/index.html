@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Rock Paper Scissors Game</title>
+
     <style>
         * {
             margin: 0;
@@ -32,16 +33,14 @@
 
         h1 {
             text-align: center;
-            color: #333;
             margin-bottom: 30px;
-            font-size: 2.5em;
         }
 
         .game-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .player, .ai {
@@ -51,12 +50,6 @@
             border-radius: 15px;
         }
 
-        .player h2, .ai h2 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-        }
-
         .move-buttons {
             display: flex;
             flex-direction: column;
@@ -64,295 +57,174 @@
         }
 
         button {
-            padding: 12px 20px;
+            padding: 12px;
             font-size: 1em;
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
             background: #667eea;
             color: white;
+            font-weight: bold;
         }
 
         button:hover {
             background: #764ba2;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        button:active {
-            transform: translateY(0);
         }
 
         .ai-move {
-            padding: 20px;
-            background: #f0f0f0;
-            border-radius: 10px;
+            padding: 15px;
             margin-top: 10px;
+            background: #eaeaea;
+            border-radius: 10px;
             font-size: 1.2em;
-            font-weight: 600;
-            color: #333;
-            min-height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 40px;
         }
 
         .result-section {
             background: #f9f9f9;
-            padding: 25px;
+            padding: 20px;
             border-radius: 15px;
             text-align: center;
             margin-bottom: 20px;
         }
 
-        .result-title {
-            color: #667eea;
-            font-size: 1.2em;
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-
         .result-text {
-            font-size: 1.8em;
-            font-weight: 700;
-            margin-bottom: 10px;
+            font-size: 1.6em;
+            font-weight: bold;
         }
 
-        .win {
-            color: #00c851;
-        }
-
-        .lose {
-            color: #ff4444;
-        }
-
-        .draw {
-            color: #ffbb33;
-        }
+        .win { color: #00c851; }
+        .lose { color: #ff4444; }
+        .draw { color: #ffbb33; }
 
         .stats {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 20px;
         }
 
         .stat {
             background: #f5f5f5;
-            padding: 15px;
+            padding: 10px;
             border-radius: 10px;
             text-align: center;
-        }
-
-        .stat-label {
-            color: #999;
-            font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #667eea;
         }
 
         .reset-btn {
             width: 100%;
             background: #ff4444;
-            padding: 15px;
-            font-size: 1.1em;
-        }
-
-        .reset-btn:hover {
-            background: #cc0000;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: #667eea;
-            border-radius: 50%;
-            animation: blink 1.4s infinite;
-            margin-left: 5px;
-        }
-
-        @keyframes blink {
-            0%, 20%, 50%, 80%, 100% {
-                opacity: 0.8;
-            }
-            40% {
-                opacity: 0.3;
-            }
-            60% {
-                opacity: 0.3;
-            }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 1.8em;
-            }
-
-            .game-section {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>🎮 Rock Paper Scissors</h1>
+<div class="container">
+    <h1>🎮 Rock Paper Scissors</h1>
 
-        <div class="result-section">
-            <div class="result-title">Result</div>
-            <div class="result-text" id="result">Choose your move</div>
-            <div style="font-size: 0.9em; color: #999;">
-                <span id="playerMoveDisplay">-</span> vs <span id="aiMoveDisplay">-</span>
-            </div>
+    <div class="result-section">
+        <div class="result-text" id="result">Choose your move</div>
+        <div>
+            <span id="playerMoveDisplay">-</span> vs
+            <span id="aiMoveDisplay">-</span>
         </div>
-
-        <div class="stats">
-            <div class="stat">
-                <div class="stat-label">Wins</div>
-                <div class="stat-value" id="wins">0</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Draws</div>
-                <div class="stat-value" id="draws">0</div>
-            </div>
-            <div class="stat">
-                <div class="stat-label">Losses</div>
-                <div class="stat-value" id="losses">0</div>
-            </div>
-        </div>
-
-        <div class="game-section">
-            <div class="player">
-                <h2>👤 Your Move</h2>
-                <div class="move-buttons">
-                    <button onclick="playGame('ROCK')">🪨 Rock</button>
-                    <button onclick="playGame('PAPER')">📄 Paper</button>
-                    <button onclick="playGame('SCISSORS')">✂️ Scissors</button>
-                </div>
-            </div>
-
-            <div class="ai">
-                <h2>🤖 AI Move</h2>
-                <div class="ai-move" id="aiMove">Waiting...</div>
-            </div>
-        </div>
-
-        <button class="reset-btn" onclick="resetStats()">🔄 Reset Stats</button>
     </div>
 
-    <script>
-        let stats = {
-            wins: 0,
-            draws: 0,
-            losses: 0
-        };
+    <div class="stats">
+        <div class="stat">Wins<br><span id="wins">0</span></div>
+        <div class="stat">Draws<br><span id="draws">0</span></div>
+        <div class="stat">Losses<br><span id="losses">0</span></div>
+    </div>
 
-        // Load stats from localStorage
-        function loadStats() {
-            const saved = localStorage.getItem('rpsStats');
-            if (saved) {
-                stats = JSON.parse(saved);
-                updateStatsDisplay();
-            }
-        }
+    <div class="game-section">
+        <div class="player">
+            <h3>👤 Your Move</h3>
+            <div class="move-buttons">
+                <button onclick="playGame('ROCK')">🪨 Rock</button>
+                <button onclick="playGame('PAPER')">📄 Paper</button>
+                <button onclick="playGame('SCISSORS')">✂️ Scissors</button>
+            </div>
+        </div>
 
-        // Save stats to localStorage
-        function saveStats() {
-            localStorage.setItem('rpsStats', JSON.stringify(stats));
-        }
+        <div class="ai">
+            <h3>🤖 AI Move</h3>
+            <div class="ai-move" id="aiMove">Waiting...</div>
+        </div>
+    </div>
 
-        // Update stats display
-        function updateStatsDisplay() {
-            document.getElementById('wins').textContent = stats.wins;
-            document.getElementById('draws').textContent = stats.draws;
-            document.getElementById('losses').textContent = stats.losses;
-        }
+    <button class="reset-btn" onclick="resetStats()">🔄 Reset Stats</button>
+</div>
 
-        // Play game
-        async function playGame(playerMove) {
-            try {
-                const resultDiv = document.getElementById('result');
-                resultDiv.textContent = 'Playing...';
+<script>
+let stats = { wins: 0, draws: 0, losses: 0 };
 
-                const response = await fetch('/api/play', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ player_move: playerMove })
-                });
+function loadStats() {
+    const saved = localStorage.getItem("rpsStats");
+    if (saved) stats = JSON.parse(saved);
+    updateStats();
+}
 
-                const data = await response.json();
+function saveStats() {
+    localStorage.setItem("rpsStats", JSON.stringify(stats));
+}
 
-                if (response.ok) {
-                    displayResult(data, playerMove);
-                } else {
-                    resultDiv.textContent = '❌ Error: ' + data.error;
-                }
-            } catch (error) {
-                document.getElementById('result').textContent = '❌ Connection error. Try again!';
-                console.error('Error:', error);
-            }
-        }
+function updateStats() {
+    wins.textContent = stats.wins;
+    draws.textContent = stats.draws;
+    losses.textContent = stats.losses;
+}
 
-        // Display result
-        function displayResult(data, playerMove) {
-            const resultDiv = document.getElementById('result');
-            const playerDisplay = document.getElementById('playerMoveDisplay');
-            const aiDisplay = document.getElementById('aiMoveDisplay');
+async function playGame(playerMove) {
+    try {
+        const res = await fetch("/api/play", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ player_move: playerMove })
+        });
 
-            playerDisplay.textContent = playerMove;
-            aiDisplay.textContent = data.ai_move;
+        const data = await res.json();
 
-            const resultMap = {
-                'PLAYER WINS': { text: '🎉 You Win!', class: 'win' },
-                'AI WINS': { text: '🤖 AI Wins', class: 'lose' },
-                'DRAW': { text: '🤝 Draw', class: 'draw' }
-            };
+        displayResult(data, playerMove);
+    } catch (err) {
+        result.textContent = "❌ Connection error";
+    }
+}
 
-            const resultInfo = resultMap[data.result];
-            resultDiv.textContent = resultInfo.text;
-            resultDiv.className = 'result-text ' + resultInfo.class;
+function displayResult(data, playerMove) {
+    const resultMap = {
+        "PLAYER WINS": ["🎉 You Win!", "win"],
+        "AI WINS": ["🤖 AI Wins", "lose"],
+        "DRAW": ["🤝 Draw", "draw"]
+    };
 
-            // Update stats
-            if (data.result === 'PLAYER WINS') {
-                stats.wins++;
-            } else if (data.result === 'DRAW') {
-                stats.draws++;
-            } else {
-                stats.losses++;
-            }
+    const [text, cls] = resultMap[data.result];
 
-            updateStatsDisplay();
-            saveStats();
-        }
+    result.className = "result-text " + cls;
+    result.textContent = text;
 
-        // Reset stats
-        function resetStats() {
-            if (confirm('Are you sure you want to reset all stats?')) {
-                stats = { wins: 0, draws: 0, losses: 0 };
-                updateStatsDisplay();
-                saveStats();
-                document.getElementById('result').textContent = 'Choose your move';
-                document.getElementById('playerMoveDisplay').textContent = '-';
-                document.getElementById('aiMoveDisplay').textContent = '-';
-            }
-        }
+    playerMoveDisplay.textContent = playerMove;
+    aiMoveDisplay.textContent = data.ai_move;
+    aiMove.textContent = data.ai_move;
 
-        // Initialize
-        loadStats();
-    </script>
+    if (data.result === "PLAYER WINS") stats.wins++;
+    else if (data.result === "DRAW") stats.draws++;
+    else stats.losses++;
+
+    updateStats();
+    saveStats();
+}
+
+function resetStats() {
+    stats = { wins: 0, draws: 0, losses: 0 };
+    saveStats();
+    updateStats();
+    result.textContent = "Choose your move";
+    aiMove.textContent = "Waiting...";
+    playerMoveDisplay.textContent = "-";
+    aiMoveDisplay.textContent = "-";
+}
+
+loadStats();
+</script>
 </body>
 </html>
