@@ -1,5 +1,6 @@
 import random
-from flask import Flask, jsonify, request
+import os
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -29,14 +30,19 @@ def decide_winner(player_move, ai_move):
 # ===================== ROUTES =====================
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({
-        "message": "AI Rock Paper Scissors Game API",
-        "endpoints": {
-            "/": "Home",
-            "/play": "POST - Submit your move",
-            "/ai-move": "GET - Get AI's random move"
-        }
-    })
+    # Serve the HTML file from public directory
+    try:
+        with open(os.path.join(os.path.dirname(__file__), '../public/index.html'), 'r') as f:
+            return f.read(), 200, {'Content-Type': 'text/html'}
+    except:
+        return jsonify({
+            "message": "AI Rock Paper Scissors Game API",
+            "endpoints": {
+                "/": "Home",
+                "/play": "POST - Submit your move",
+                "/ai-move": "GET - Get AI's random move"
+            }
+        })
 
 @app.route("/play", methods=["POST"])
 def play():
