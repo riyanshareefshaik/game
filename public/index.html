@@ -286,7 +286,7 @@
                 const resultDiv = document.getElementById('result');
                 resultDiv.textContent = 'Playing...';
 
-                const response = await fetch('/play', {
+                const response = await fetch('/api/play', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
