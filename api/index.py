@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 import random
 
 app = Flask(__name__)
+CORS(app)
 
-# ===================== GAME LOGIC =====================
 def decide_winner(player_move, ai_move):
-    """Determine winner between two moves"""
     if player_move == ai_move:
         return "DRAW"
     if (player_move == "ROCK" and ai_move == "SCISSORS") or \
@@ -14,63 +14,26 @@ def decide_winner(player_move, ai_move):
         return "PLAYER WINS"
     return "AI WINS"
 
-# ===================== ROUTES =====================
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({
-        "message": "AI Rock Paper Scissors Game API",
-        "endpoints": {
-            "/api/play": "POST - Play a round",
-            "/api/ai-move": "GET - Get AI move",
-            "/api/rules": "GET - Get rules"
-        }
-    })
+    return jsonify({"status": "API running"})
 
 @app.route("/api/play", methods=["POST"])
 def play():
-    """
-    Play a round against the AI
-    Expected JSON: {"player_move": "ROCK|PAPER|SCISSORS"}
-    """
-    try:
-        data = request.json
-        player_move = data.get("player_move", "").upper()
+    data = request.get_json()
+    player_move = data.get("player_move", "").upper()
 
-        # Validate move
-        valid_moves = ["ROCK", "PAPER", "SCISSORS"]
-        if player_move not in valid_moves:
-            return jsonify({
-                "error": f"Invalid move. Must be one of: {valid_moves}"
-            }), 400
+    valid = ["ROCK", "PAPER", "SCISSORS"]
+    if player_move not in valid:
+        return jsonify({"error": "Invalid move"}), 400
 
-        # AI plays random move
-        ai_move = random.choice(valid_moves)
+    ai_move = random.choice(valid)
+    result = decide_winner(player_move, ai_move)
 
-        # Determine winner
-        result = decide_winner(player_move, ai_move)
-
-        return jsonify({
-            "player_move": player_move,
-            "ai_move": ai_move,
-            "result": result
-        })
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route("/api/ai-move", methods=["GET"])
-def ai_move():
-    """Get a random AI move"""
-    moves = ["ROCK", "PAPER", "SCISSORS"]
-    return jsonify({"ai_move": random.choice(moves)})
-
-@app.route("/api/rules", methods=["GET"])
-def rules():
-    """Get game rules"""
     return jsonify({
-        "rules": {
-            "ROCK": "Beats SCISSORS",
-            "PAPER": "Beats ROCK",
-            "SCISSORS": "Beats PAPER"
-        }
+        "player_move": player_move,
+        "ai_move": ai_move,
+        "result": result
     })
+
+# ❌ DO NOT use app.run() on Vercel
