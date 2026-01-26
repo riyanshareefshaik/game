@@ -1,11 +1,7 @@
-from flask import Flask, send_from_directory, jsonify, request
-import os
+from flask import Flask, jsonify, request
 import random
 
 app = Flask(__name__)
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PUBLIC_DIR = os.path.join(BASE_DIR, "..", "public")
 
 # ===================== GAME LOGIC =====================
 def decide_winner(player_move, ai_move):
@@ -19,9 +15,16 @@ def decide_winner(player_move, ai_move):
     return "AI WINS"
 
 # ===================== ROUTES =====================
-@app.route("/")
+@app.route("/", methods=["GET"])
 def home():
-    return send_from_directory(PUBLIC_DIR, "index.html")
+    return jsonify({
+        "message": "AI Rock Paper Scissors Game API",
+        "endpoints": {
+            "/api/play": "POST - Play a round",
+            "/api/ai-move": "GET - Get AI move",
+            "/api/rules": "GET - Get rules"
+        }
+    })
 
 @app.route("/api/play", methods=["POST"])
 def play():
@@ -71,7 +74,3 @@ def rules():
             "SCISSORS": "Beats PAPER"
         }
     })
-
-@app.route("/<path:path>")
-def static_files(path):
-    return send_from_directory(PUBLIC_DIR, path)
